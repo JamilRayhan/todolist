@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}
+    {{ title }}
+{% endblock  %}
+
+{% block css_block %}
+
+{% endblock  %}
+{% block content %}
+    <h2>Welcome, {{ user.username }}!</h2>
+    <h3>Your Tasks:</h3>
+    <ul>
+        {% for task in tasks %}
+            <li>
+                <input type="checkbox" id="task_{{ task.id }}" {% if task.completed %}checked{% endif %} onclick="toggleTaskCompleted('{{ task.id }}')">
+                <label for="task_{{ task.id }}">{{ task.title }}</label> {% if task.completed %}(Completed){% endif %} - Added on {{ task.created_at|date:"H:i F d, Y" }}
+            </li>
+        {% empty %}
+            <li>No tasks yet.</li>
+        {% endfor %}
+    </ul>
+    <h3>Add New Task:</h3>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Add Task</button>
+    </form>
+    <form action="{% url 'App_login:logout' %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Logout</button>
+    </form>
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+{% endblock %}
+
+<script>
+    function toggleTaskCompleted(taskId) {
+        var checkbox = document.getElementById('task_' + taskId);
+        fetch('/toggle-task-completed/' + taskId + '/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                completed: checkbox.checked
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to toggle task completion status');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            checkbox.checked = !checkbox.checked;
+        });
+    }
+</script>

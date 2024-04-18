@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Signup - Your Website Name
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="signup">
+        <h4 class="text">Create an Account</h4>
+        <form method="POST">
+            {{form}}
+            {% csrf_token %}
+            <button type="submit" style="width:100%" class="btn btn-primary btn-sm">Sign Up</button>
+        </form>
+    </div>
+    <div class="login text">
+        <p>Already have an account? <a href="{% url 'App_login:login' %}">Log In</a></p>
+    </div>
+</div>
+{% endblock %}
